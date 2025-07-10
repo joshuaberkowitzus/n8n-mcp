@@ -23,3 +23,7 @@ steps:
 # This assumes the 'docker buildx build' command successfully outputs a local image.
 images:
 - 'gcr.io/$PROJECT_ID/n8n-mcp:latest'
+# Add this new section:
+options:
+  logging: CLOUD_LOGGING_ONLY # This tells Cloud Build to send logs to Cloud Logging
+
