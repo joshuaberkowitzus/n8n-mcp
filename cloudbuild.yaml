@@ -1,6 +1,5 @@
 steps:
-- name: 'docker/compose:latest' # Or 'docker/compose:latest' for Compose V2+
-  entrypoint: 'docker-compose'
+- name: 'gcr.io/cloud-builders/compose@sha256:8e09dcba2b7e0c6a0c8d6271a839b80a2fddad54e3f41f47b7a6d84b3e7d6fb9'
   args: ['-f', 'docker-compose.buildkit.yml', 'build']
   env:
     - 'DOCKER_BUILDKIT=1'
