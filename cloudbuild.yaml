@@ -1,0 +1,12 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  env: ['DOCKER_BUILDKIT=1'] # Enable BuildKit for this step
+  args:
+    - 'build'
+    - '--file=docker-compose.buildkit.yml' # Specify your Docker Compose file
+    - '--target=n8n-mcp' # Specify the service from your Docker Compose file you want to build
+    - '-t'
+    - 'gcr.io/$PROJECT_ID/n8n-mcp:latest' # Tag your image for Artifact Registry/Container Registry
+    - '.' # Build context (current directory)
+images:
+- 'gcr.io/$PROJECT_ID/n8n-mcp:latest' # List the image to push to Artifact Registry/Container Registry
