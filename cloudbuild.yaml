@@ -1,22 +1,25 @@
 steps:
-  # Step 1: Create a BuildKit builder instance
-  # This uses the official Docker Buildx image from Docker Hub
-  - name: 'docker/buildx:latest' # Or a specific stable version like docker/buildx:0.12.1
-    entrypoint: 'docker'
-    args: ['buildx', 'create', '--use', '--name', 'mybuilder']
+- name: 'gcr.io/cloud-builders/docker' # Use the standard Cloud Build Docker builder
+  entrypoint: 'bash' # Execute commands within a bash shell for precise control
+  args:
+    - '-c' # This tells bash to execute the following string as a command
+    - |
+      # Explicitly set DOCKER_BUILDKIT to 1 for this shell session.
+      # This is crucial for enabling BuildKit features like --mount=type=cache.
+      export DOCKER_BUILDKIT=1
 
-  # Step 2: Build the Docker image using the created BuildKit builder
-  # This explicitly tells buildx to use the 'mybuilder' instance
-  - name: 'docker/buildx:latest'
-    entrypoint: 'docker'
-    args:
-      - 'buildx'
-      - 'build'
-      - '--builder=mybuilder' # Use the builder instance created in the previous step
-      - '--platform=linux/amd64'
-      - '--output=type=docker,name=gcr.io/$PROJECT_ID/n8n-mcp:latest,push=true' # Push directly to registry
-      - '.' # Build context (current directory)
+      # Perform the build using docker buildx build
+      # --platform=linux/amd64 ensures the correct architecture is built.
+      # --output=type=docker,dest=/tmp/image.tar makes the image available locally for the next step.
+      # -t gcr.io/$PROJECT_ID/n8n-mcp:latest tags the image.
+      # . specifies the build context (current directory where Dockerfile resides).
+      docker buildx build \
+        --platform=linux/amd64 \
+        --output=type=docker \
+        -t gcr.io/$PROJECT_ID/n8n-mcp:latest \
+        .
 
-# No 'images' section needed as buildx pushes directly
-# images:
-# - 'gcr.io/$PROJECT_ID/n8n-mcp:latest'
+# The 'images' section tells Cloud Build to push the tagged image to your registry.
+# This assumes the 'docker buildx build' command successfully outputs a local image.
+images:
+- 'gcr.io/$PROJECT_ID/n8n-mcp:latest'
