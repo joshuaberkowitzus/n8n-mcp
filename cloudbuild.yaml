@@ -1,19 +1,9 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  entrypoint: 'sh'
-  args:
-    - '-c'
-    - |
-      apk add --no-cache py3-pip && pip install docker-compose
-
-- name: 'gcr.io/cloud-builders/docker'
-  entrypoint: 'sh'
+- name: 'docker/compose:latest' # Or 'docker/compose:latest' for Compose V2+
+  entrypoint: 'docker-compose'
+  args: ['-f', 'docker-compose.buildkit.yml', 'build']
   env:
     - 'DOCKER_BUILDKIT=1'
-  args:
-    - '-c'
-    - |
-      docker-compose -f docker-compose.buildkit.yml build
       
 #- name: 'gcr.io/cloud-builders/docker' # Use the standard Cloud Build Docker builder
 #  entrypoint: 'bash' # Execute commands within a bash shell for precise control
