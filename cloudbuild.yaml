@@ -1,28 +1,23 @@
-steps:
-- name: 'gcr.io/cloud-builders/compose'
-  args: ['-f', 'docker-compose.buildkit.yml', 'build']
-  env:
-    - 'DOCKER_BUILDKIT=1'
-      
-#- name: 'gcr.io/cloud-builders/docker' # Use the standard Cloud Build Docker builder
-#  entrypoint: 'bash' # Execute commands within a bash shell for precise control
-#  args:
-#    - '-c' # This tells bash to execute the following string as a command
-#    - |
-#      # Explicitly set DOCKER_BUILDKIT to 1 for this shell session.
-#      # This is crucial for enabling BuildKit features like --mount=type=cache.
-#      export DOCKER_BUILDKIT=1
-#
-#      # Perform the build using docker buildx build
-#      # --platform=linux/amd64 ensures the correct architecture is built.
-#      # --output=type=docker,dest=/tmp/image.tar makes the image available locally for the next step.
-#      # -t gcr.io/$PROJECT_ID/n8n-mcp:latest tags the image.
-#      # . specifies the build context (current directory where Dockerfile resides).
-#      docker buildx build \
-#        --platform=linux/amd64 \
-#        --output=type=docker \
-#        -t gcr.io/$PROJECT_ID/n8n-mcp:latest \
-#        .
+steps: 
+- name: 'gcr.io/cloud-builders/docker' # Use the standard Cloud Build Docker builder
+  entrypoint: 'bash' # Execute commands within a bash shell for precise control
+  args:
+    - '-c' # This tells bash to execute the following string as a command
+    - |
+      # Explicitly set DOCKER_BUILDKIT to 1 for this shell session.
+      # This is crucial for enabling BuildKit features like --mount=type=cache.
+      export DOCKER_BUILDKIT=1
+
+      # Perform the build using docker buildx build
+      # --platform=linux/amd64 ensures the correct architecture is built.
+      # --output=type=docker,dest=/tmp/image.tar makes the image available locally for the next step.
+      # -t gcr.io/$PROJECT_ID/n8n-mcp:latest tags the image.
+      # . specifies the build context (current directory where Dockerfile resides).
+      docker buildx build \
+        --platform=linux/amd64 \
+        --output=type=docker \
+        -t gcr.io/$PROJECT_ID/n8n-mcp:latest \
+        .
 
 # The 'images' section tells Cloud Build to push the tagged image to your registry.
 # This assumes the 'docker buildx build' command successfully outputs a local image.
