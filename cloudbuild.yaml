@@ -1,11 +1,22 @@
 steps:
-- name: 'docker/compose:1.29.2' # Or a newer version if available and desired
-  entrypoint: 'docker-compose' # Specify the entrypoint for the builder
-  env: ['DOCKER_BUILDKIT=1'] # Explicitly enable BuildKit
-  args:
-    - '-f' # Specify the compose file
-    - 'docker-compose.buildkit.yml'
-    - 'build' # The build command for docker-compose
-    - 'n8n-mcp' # Specify the service to build from your compose file
-images:
-- 'gcr.io/$PROJECT_ID/n8n-mcp:latest' # Tag your image for Artifact Registry/Container Registry
+  # Step 1: Create a BuildKit builder instance
+  # This uses the official Docker Buildx image from Docker Hub
+  - name: 'docker/buildx:latest' # Or a specific stable version like docker/buildx:0.12.1
+    entrypoint: 'docker'
+    args: ['buildx', 'create', '--use', '--name', 'mybuilder']
+
+  # Step 2: Build the Docker image using the created BuildKit builder
+  # This explicitly tells buildx to use the 'mybuilder' instance
+  - name: 'docker/buildx:latest'
+    entrypoint: 'docker'
+    args:
+      - 'buildx'
+      - 'build'
+      - '--builder=mybuilder' # Use the builder instance created in the previous step
+      - '--platform=linux/amd64'
+      - '--output=type=docker,name=gcr.io/$PROJECT_ID/n8n-mcp:latest,push=true' # Push directly to registry
+      - '.' # Build context (current directory)
+
+# No 'images' section needed as buildx pushes directly
+# images:
+# - 'gcr.io/$PROJECT_ID/n8n-mcp:latest'
